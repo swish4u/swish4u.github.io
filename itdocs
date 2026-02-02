@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pico MES Infrastructure Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background-color: #f9fafb;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #2563eb, #1e40af);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .nav-tabs {
+            background: white;
+            border-bottom: 2px solid #e5e7eb;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+        
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: white;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.95rem;
+        }
+        
+        .nav-tab:hover {
+            border-color: #3b82f6;
+            color: #2563eb;
+        }
+        
+        .nav-tab.active {
+            border-color: #2563eb;
+            background: #eff6ff;
+            color: #1e40af;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            padding-bottom: 4rem;
+        }
+        
+        .document-section {
+            display: none;
+        }
+        
+        .document-section.active {
+            display: block;
+        }
+        
+        .document-title {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .document-title h2 {
+            font-size: 1.75rem;
+            color: #1f2937;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: #f3f4f6;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        
+        .section-header:hover {
+            background: #e5e7eb;
+        }
+        
+        .section-header h3 {
+            font-size: 1.25rem;
+            color: #1f2937;
+        }
+        
+        .section-header .toggle {
+            font-size: 1.5rem;
+            color: #6b7280;
+            transition: transform 0.2s;
+        }
+        
+        .section-header.open .toggle {
+            transform: rotate(180deg);
+        }
+        
+        .section-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .section-content.show {
+            max-height: 50000px;
+            padding: 1.5rem;
+        }
+        
+        .content h4 {
+            font-weight: bold;
+            color: #1f2937;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        
+        .content p {
+            color: #374151;
+            margin-bottom: 0.75rem;
+        }
+        
+        .content ul {
+            margin-left: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .content li {
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
+        
+        .compliance-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .compliance-box h3 {
+            color: #1e40af;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+        
+        .compliance-box p {
+            color: #1e40af;
+            margin-bottom: 0.75rem;
+        }
+        
+        .compliance-box strong {
+            font-weight: 600;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+            background: white;
+            margin-top: 2rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .footer p {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .nav-tabs {
+                display: none;
+            }
+            .section {
+                page-break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #e5e7eb;
+            }
+            .section-content {
+                display: block !important;
+                max-height: none !important;
+                padding: 1.5rem !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            .nav-tab {
+                font-size: 0.875rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Pico MES Infrastructure Documentation</h1>
+        <p>Comprehensive deployment guides for various security environments</p>
+    </div>
+    
+    <div class="nav-tabs">
+        <div class="nav-container">
+            <button class="nav-tab active" onclick="showDocument('standard')">Standard On-Premises</button>
+            <button class="nav-tab" onclick="showDocument('vm')">Customer-Hosted VM</button>
+            <button class="nav-tab" onclick="showDocument('moderate')">Moderate Restrictions</button>
+            <button class="nav-tab" onclick="showDocument('strict')">Strict Air-Gapped</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Standard On-Premises Deployment -->
+        <div id="standard" class="document-section active">
+            <div class="document-title">
+                <h2>Standard On-Premises Deployment</h2>
+            </div>
+            
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h3>Deployment Overview</h3>
+                    <span class="toggle">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="content">
+                        <h4>System Architecture</h4>
+                        <p>The Pico MES system consists of three primary components:</p>
+                        
+                        <h4>1. Pico Server (Intel NUC-based)</h4>
+                        <ul>
+                            <li>One server per factory facility</li>
+                            <li>Runs Ubuntu Server operating system</li>
+                            <li>Hosts proprietary Pico MES web application</li>
+                            <li>Provides latency-free operation independent of internet connectivity</li>
+                            <li>Stores all customer data locally on-premise</li>
+                        </ul>
+                        
+                        <h4>2. Pico Hubs (Edge Devices)</h4>
+                        <ul>
+                            <li>Microcontroller-based edge devices</li>
+                            <li>Distributed throughout factory floor</li>
+                            <li>Connect operators, tools, and machines to the MES</li>
+                            <li>Communicate with Pico Server over local network</li>
+                            <li>Support both Ethernet and Wi-Fi connectivity</li>
+                        </ul>
+                        
+                        <h4>3. Cloud Services</h4>
+                        <ul>
+                            <li>Account management via account.picomes.io</li>
+                            <li>Remote VPN access at vpn2.picomes.com (ports 443/1194)</li>
+                            <li>Nightly backup storage in GCP</li>
+                            <li>System updates and configuration management</li>
+                            <li>Optional database replication for analytics</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h3>Network Architecture & Communication</h3>
+                    <span class="toggle">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="content">
+                        <h4>Local Network Requirements</h4>
+                        <p>The Pico Server must be connected to the customer's local network with the ability to communicate with all Pico Hubs.</p>
+                        
+                        <h4>Hub-to-Server Communication</h4>
+                        <ul>
+                            <li>HTTPS for secure web application access</li>
+                            <li>WebSocket connections for real-time data streaming</li>
+                            <li>Local network discovery protocols for Hub registration</li>
+                        </ul>
+                        
+                        <h4>Tool/Machine Connectivity</h4>
+                        <ul>
+                            <li>Direct network connection for network-enabled tools</li>
+                            <li>USB, RS232, and other protocols via Pico Hubs for legacy equipment</li>
+                            <li>HDMI touchscreen support through Pico Hubs</li>
+                        </ul>
+                        
+                        <h4>Supported Tool Protocols</h4>
+                        <ul>
+                            <li>Open Protocol (PFOP) for torque tools</li>
+                            <li>Serial/RS232, HTTP, Modbus</li>
+                            <li>Bluetooth Serial, USB HID</li>
+                            <li>OPC UA, ZPL/PNG/PDF (printers)</li>
+                            <li>Digital/Analog IO, USB Webcam</li>
+                            <li>USB PCSC (badge readers), TCP/IP</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h3>Pico VPN Remote Access</h3>
+                    <span class="toggle">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="content">
+                        <h4>VPN Overview</h4>
+                        <p>The Pico Server is configured to reach out and connect as a client to the Pico VPN running in the cloud. This VPN connection enables authorized Pico personnel to provide remote support, troubleshooting, and system updates.</p>
+                        
+                        <h4>Technical Specifications</h4>
+                        <ul>
+                            <li>Shorewalling implementation</li>
+                            <li>TLS 1.3 with TLS Ciphersuite SHA-256</li>
+                            <li>ECDSA encryption using curve secp384r1</li>
+                            <li>Shared TLS-Auth key for additional security</li>
+                            <li>Key-based access controls (no password authentication)</li>
+                            <li>Evaluated by expert 3rd party cybersecurity firms</li>
+                        </ul>
+                        
+                        <h4>Connection Details</h4>
+                        <ul>
+                            <li>Primary VPN endpoint: vpn2.picomes.com</li>
+                            <li>Default port: 443 (HTTPS)</li>
+                            <li>Alternate port: 1194 (if port 443 unavailable)</li>
+                            <li>Connection initiated by Pico Server (outbound only)</li>
+                        </ul>
+                        
+                        <h4>Access Control</h4>
+                        <p>For ITAR and security-sensitive deployments:</p>
+                        <ul>
+                            <li>US Citizen-only employee access available</li>
+                            <li>Limited number of cleared personnel for strict environments</li>
+                            <li>Access restrictions documented and auditable</li>
+                        </ul>
+                        
+                        <h4>Disabling VPN Access</h4>
+                        <p>Customers can disable VPN connectivity by blocking outbound connections to vpn2.picomes.com at the firewall. This is suitable for air-gapped and high-security environments, but will require on-site support for updates and troubleshooting.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h3>Security & Compliance</h3>
+                    <span class="toggle">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="content">
+                        <h4>SOC 2 Type 2 Certification</h4>
+                        <p>Pico MES completed SOC 2 Type 2 compliance certification as of Q3 2022, demonstrating:</p>
+                        <ul>
+                            <li>Robust security controls and procedures</li>
+                            <li>Continuous monitoring and auditing</li>
+                            <li>Data protection and privacy safeguards</li>
+                            <li>Secure development practices</li>
+                            <li>Incident response capabilities</li>
+                        </ul>
+                        
+                        <h4>ITAR Compliance & Registration</h4>
+                        <p>For customers with ITAR requirements, Pico provides:</p>
+                        <ul>
+                            <li>ITAR-registered support personnel</li>
+                            <li>US Citizen-only remote access for sensitive deployments</li>
+                            <li>Secure VPN access with audited controls</li>
+                            <li>On-premise data storage options</li>
+                            <li>Configurable cloud connectivity restrictions</li>
+                        </ul>
+                        
+                        <h4>Security Features</h4>
+                        <p><strong>Network Security:</strong></p>
+                        <ul>
+                            <li>HTTPS for all web application access</li>
+                            <li>Encrypted VPN connections for remote support</li>
+                            <li>TLS 1.3 with modern cipher suites</li>
+                            <li>Network segmentation support</li>
+                        </ul>
+                        
+                        <p><strong>Access Controls:</strong></p>
+                        <ul>
+                            <li>Role-based access control (RBAC)</li>
+                            <li>SSO integration with enterprise identity providers</li>
+                            <li>Multi-factor authentication support</li>
+                            <li>Audit logging of all user actions</li>
+                        </ul>
+                        
+                        <p><strong>Data Security:</strong></p>
+                        <ul>
+                            <li>Encryption at rest and in transit</li>
+                            <li>Local data storage by default</li>
+                            <li>SOC 2 compliant backup partners</li>
+                            <li>Customer-controlled data replication</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Customer-Hosted VM Deployment -->
+        <div id="vm" class="document-section">
+            <div class="document-title">
+                <h2>Customer-Hosted Virtual Machine Deployment</h2>
+            </div>
+            
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h3>VM Deployment Overview</h3>
+                    <span class="toggle">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="content">
+                        <h4>Deployment Model</h4>
+                        <p>For customers who prefer to host Pico MES on their own infrastructure, the system can be deployed on customer-owned virtual machines or server racks.</p>
+                        
+                        <h4>Key Characteristics</h4>
+                        <ul>
+                            <li>Pico MES runs on customer-provided VM or physical server</li>
+                            <li>Ubuntu Server operating system required</li>
+                            <li>Customer manages hardware/VM infrastructure</li>
+                            <li>Pico manages software and application updates</li>
+                            <li>Maintains connection to Pico cloud services (configurable)</li>
+                            <li>All standard Pico MES features available</li>
+                            <li>Suitable for Level 1 "Convenience Air-Gap" security posture</li>
+                        </ul>
+                        
+                        <h4>Compliance</h4>
+                        <ul>
+                            <li>SOC 2 Type 2 certified application</li>
+                            <li>ITAR-compliant deployment options available</li>
+                            <li>Customer infrastructure subject to own audits</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h3>VM Specifications & Requirements</h3>
+                    <span class="toggle">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="content">
+                        <h4>Virtual Machine Specifications</h4>
+                        <p><strong>Minimum Requirements:</strong></p>
+                        <ul>
+                            <li>4 vCPUs</li>
+                            <li>8GB RAM</li>
+                            <li>256GB storage (SSD recommended)</li>
+                            <li>Ubuntu Server 20.04 LTS or newer</li>
+                            <li>Virtualization platform: VMware ESXi, Hyper-V, KVM, or equivalent</li>
+                        </ul>
+                        
+                        <p><strong>Recommended Configuration:</strong></p>
+                        <ul>
+                            <li>8 vCPUs</li>
+                            <li>16GB RAM</li>
+                            <li>512GB storage (SSD)</li>
+                            <li>Dedicated network interface</li>
+                            <li>VM snapshot capability for backups</li>
+                        </ul>
+                        
+                        <h4>Network Requirements</h4>
+                        <p><strong>Required Internal Connectivity:</strong></p>
+                        <ul>
+                            <li>Static IP address on customer network</li>
+                            <li>Access to all Pico Hubs (bidirectional)</li>
+                            <li>DNS resolution for internal resources</li>
+                            <li>NTP server access (customer or internet)</li>
+                        </ul>
+                        
+                        <p><strong>Required External Connectivity:</strong></p>
+                        <ul>
+                            <li>Outbound HTTPS (443) to account.picomes.io</li>
+                            <li>Outbound VPN (443 or 1194) to vpn2.picomes.com</li>
+                            <li>Outbound HTTPS to GCP for backups (optional)</li>
+                            <li>Inbound HTTPS from user workstations</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Moderate Restrictions Deployment -->
+        <div id="moderate" class="document-section">
+            <div class="document-title">
+                <h2>Moderate Restrictions Deployment</h2>
+            </div>
+            
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h3>Level 2 Overview</h3>
+                    <span class="toggle">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="content">
+                        <h4>Moderate Restrictions Configuration</h4>
+                        <p>Level 2 "Moderate Restrictions" deployment provides enhanced security while maintaining manageable operational procedures.</p>
+                        
+                        <h4>Key Characteristics</h4>
+                        <ul>
+                            <li>VPN access can be completely disabled</li>
+                            <li>Manual software updates only</li>
+                            <li>Internet egress allowed for specific functions</li>
+                            <li>Mixed authentication models (cloud + local)</li>
+                            <li>Self-managed backups and data replication</li>
+                            <li>On-site troubleshooting required</li>
+                        </ul>
+                        
+                        <h4>Security Posture</h4>
+                        <ul>
+                            <li>No persistent remote access by Pico personnel</li>
+                            <li>Customer controls when/if VPN is enabled</li>
+                            <li>Reduced cloud dependencies</li>
+                            <li>Enhanced audit and control capabilities</li>
+                            <li>Suitable for ITAR Level 2 requirements</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h3>Network Whitelist Configuration</h3>
+                    <span class="toggle">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="content">
+                        <h4>Required Domains and Addresses</h4>
+                        <p>For Level 2 deployments with limited internet access, the following domains and addresses must be whitelisted:</p>
+                        
+                        <h4>Authentication Services (Optional - if using cloud authentication)</h4>
+                        <p><strong>Microsoft SSO:</strong></p>
+                        <ul>
+                            <li>login.microsoftonline.com (HTTPS/443)</li>
+                            <li>login.microsoft.com (HTTPS/443)</li>
+                            <li>graph.microsoft.com (HTTPS/443)</li>
+                        </ul>
+                        
+                        <p><strong>Google SSO:</strong></p>
+                        <ul>
+                            <li>accounts.google.com (HTTPS/443)</li>
+                            <li>oauth2.googleapis.com (HTTPS/443)</li>
+                        </ul>
+                        
+                        <p><strong>Pico Account Services:</strong></p>
+                        <ul>
+                            <li>account.picomes.io (HTTPS/443)</li>
+                        </ul>
+                        
+                        <h4>VPN Access (Optional - if enabled temporarily)</h4>
+                        <ul>
+                            <li>vpn2.picomes.com (Port 443 primary, Port 1194 alternate)</li>
+                        </ul>
+                        
+                        <h4>Operating System Updates</h4>
+                        <ul>
+                            <li>archive.ubuntu.com (HTTPS/443)</li>
+                            <li>security.ubuntu.com (HTTPS/443)</li>
+                            <li>*.ubuntu.com (HTTPS/443) - for full Ubuntu repository access</li>
+                        </ul>
+                        
+                        <h4>Time Synchronization (Critical)</h4>
+                        <ul>
+                            <li>pool.ntp.org (NTP/123) - or customer-provided NTP server</li>
+                            <li>0.pool.ntp.org (NTP/123)</li>
+                            <li>1.pool.ntp.org (NTP/123)</li>
+                            <li>2.pool.ntp.org (NTP/123)</li>
+                            <li>3.pool.ntp.org (NTP/123)</li>
+                        </ul>
+                        
+                        <h4>Certificate Validation</h4>
+                        <ul>
+                            <li>ocsp.digicert.com (HTTP/80, HTTPS/443)</li>
+                            <li>crl.microsoft.com (HTTP/80)</li>
+                            <li>*.globalsign.com (HTTP/80, HTTPS/443)</li>
+                        </ul>
+                        
+                        <h4>Backup Services (Optional)</h4>
+                        <p><strong>Pico Cloud Backup:</strong></p>
+                        <ul>
+                            <li>storage.googleapis.com (HTTPS/443)</li>
+                            <li>*.googleapis.com (HTTPS/443)</li>
+                        </ul>
+                        
+                        <p><strong>AWS S3:</strong></p>
+                        <ul>
+                            <li>s3.amazonaws.com (HTTPS/443)</li>
+                            <li>*.s3.amazonaws.com (HTTPS/443)</li>
+                        </ul>
+                        
+                        <p><strong>Google Cloud Storage:</strong></p>
+                        <ul>
+                            <li>storage.googleapis.com (HTTPS/443)</li>
+                            <li>*.storage.googleapis.com (HTTPS/443)</li>
+                        </ul>
+                        
+                        <p><strong>Azure Blob Storage:</strong></p>
+                        <ul>
+                            <li>*.blob.core.windows.net (HTTPS/443)</li>
+                        </ul>
+                        
+                        <h4>Minimum Configuration (Most Restricted)</h4>
+                        <p>For customers wanting absolute minimum internet access:</p>
+                        <ul>
+                            <li>Local NTP server (customer-provided) - Port 123</li>
+                            <li>No authentication cloud services (use LDAP/AD or local auth)</li>
+                            <li>No VPN access (on-site support only)</li>
+                            <li>Local backup destination only</li>
+                            <li>Manual OS updates via secure media</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h3>GCC High Authentication Setup</h3>
+                    <span class="toggle">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="content">
+                        <h4>Microsoft Azure GCC High SSO Integration</h4>
+                        <p>For government customers using GCC High tenants, Pico MES can integrate with Azure Entra ID (formerly Azure AD) for seamless Single Sign-On authentication.</p>
+                        
+                        <h4>Overview</h4>
+                        <p>Pico MES integrates with your GCC High tenant for Azure Entra ID SSO by setting up an application registration in your tenant that points to Pico's account services. This provides limited information to Pico - only enough to identify operators and managers for proper system permissions.</p>
+                        
+                        <h4>Required Information</h4>
+                        <ul>
+                            <li>Application (client) ID</li>
+                            <li>Client Secret Value</li>
+                            <li>Client Secret ID</li>
+                        </ul>
+                        
+                        <h4>Setup Process</h4>
+                        <p><strong>Step 1: Create App Registration</strong></p>
+                        <ol>
+                            <li>Navigate to Azure Portal and search for "App registrations"</li>
+                            <li>Click "New registration"</li>
+                            <li>Configure the application:
+                                <ul>
+                                    <li>Name: PicoMES</li>
+                                    <li>Supported account types: Select "Accounts in any organizational directory (Any Microsoft Entra ID tenant - Multitenant) and personal Microsoft accounts"</li>
+                                    <li>Redirect URI: Select "Web" and enter: https://account.picomes.io/auth/azuregcchigh/callback</li>
+                                </ul>
+                            </li>
+                            <li>Click "Register"</li>
+                        </ol>
+                        
+                        <p><strong>Step 2: Copy Application (Client) ID</strong></p>
+                        <ul>
+                            <li>After registration, copy the Application (client) ID GUID</li>
+                            <li>Save this securely - you'll provide it to Pico</li>
+                        </ul>
+                        
+                        <p><strong>Step 3: Create Client Secret</strong></p>
+                        <ol>
+                            <li>Click "Add a certificate or secret" link</li>
+                            <li>Click "New client secret"</li>
+                            <li>Configure the secret:
+                                <ul>
+                                    <li>Description: PicoAppSecret (or your preferred name)</li>
+                                    <li>Expires: Recommended 12 months (1 year)</li>
+                                </ul>
+                            </li>
+                            <li>Click "Add"</li>
+                            <li>Copy BOTH the Value and Secret ID immediately (The Value will only be shown once)</li>
+                        </ol>
+                        
+                        <p><strong>Step 4: Configure API Permissions</strong></p>
+                        <ol>
+                            <li>Click "API permissions" in the left navigation</li>
+                            <li>Click "Add a permission"</li>
+                            <li>Select "Microsoft Graph"</li>
+                            <li>Select "Delegated permissions"</li>
+                            <li>Add the following permissions:
+                                <ul>
+                                    <li>email (View users' email address)</li>
+                                    <li>openid (Sign users in)</li>
+                                    <li>profile (View users' basic profile)</li>
+                                </ul>
+                            </li>
+                            <li>Click "Add permissions"</li>
+                        </ol>
+                        
+                        <h4>Network Requirements for GCC High</h4>
+                        <p>Ensure the following domains are whitelisted:</p>
+                        <ul>
+                            <li>login.microsoftonline.com (HTTPS/443)</li>
+                            <li>graph.microsoft.com (HTTPS/443)</li>
+                            <li>account.picomes.io (HTTPS/443)</li>
+                        </ul>
+                        
+                        <h4>Annual Maintenance</h4>
+                        <ul>
+                            <li>Client secrets expire after one year (recommended setting)</li>
+                            <li>Generate new secret before expiration</li>
+                            <li>Provide new credentials to Pico</li>
+                            <li>Old secret can be deleted after Pico confirms new credentials working</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Strict Air-Gapped Deployment -->
+        <div id="strict" class="document-section">
+            <div class="document-title">
+                <h2>Strict Air-Gapped Deployment</h2>
+            </div>
+            
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h3>Level 3 Strict Air-Gap Overview</h3>
+                    <span class="toggle">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="content">
+                        <h4>Maximum Security Air-Gap Configuration</h4>
+                        <p>Level 3 "Strict Air-Gap" represents the most secure deployment configuration for organizations with the highest security requirements.</p>
+                        
+                        <h4>Defining Characteristics</h4>
+                        <ul>
+                            <li>Zero outbound internet connectivity from Pico system</li>
+                            <li>No VPN or remote access by Pico personnel</li>
+                            <li>Complete customer-managed operations</li>
+                            <li>Local authentication only - no cloud services</li>
+                            <li>Self-managed backups with no cloud involvement</li>
+                            <li>On-site support only</li>
+                        </ul>
+                        
+                        <h4>Security Posture</h4>
+                        <ul>
+                            <li>Air-gapped from internet at network level</li>
+                            <li>Physically isolated from external networks</li>
+                            <li>Complete data sovereignty</li>
+                            <li>Maximum audit and control</li>
+                            <li>Suitable for ITAR Level 3, classified environments</li>
+                        </ul>
+                        
+                        <h4>Prerequisites</h4>
+                        <ul>
+                            <li>Advanced Linux system administration expertise</li>
+                            <li>Dedicated IT staff with 24/7 availability</li>
+                            <li>Comprehensive backup and disaster recovery capabilities</li>
+                            <li>Procedures for air-gapped software updates</li>
+                            <li>Physical security controls for on-site support</li>
+                            <li>Detailed documentation and change management</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h3>Network Isolation & Security</h3>
+                    <span class="toggle">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="content">
+                        <h4>Complete Network Isolation</h4>
+                        <p><strong>Physical Network Separation:</strong></p>
+                        <ul>
+                            <li>Dedicated VLAN or physically separate network</li>
+                            <li>No routing to internet-connected networks</li>
+                            <li>Air-gapped at firewall level</li>
+                            <li>Only internal connectivity permitted</li>
+                        </ul>
+                        
+                        <h4>Allowed Connections</h4>
+                        <ul>
+                            <li>Pico Hubs ↔ Pico Server (bidirectional)</li>
+                            <li>User workstations → Pico Server (HTTPS only)</li>
+                            <li>Pico Server → Customer LDAP/AD (authentication)</li>
+                            <li>Pico Server → Local NTP server (time sync)</li>
+                            <li>Pico Server → Local file server (backups)</li>
+                        </ul>
+                        
+                        <h4>Blocked Connections</h4>
+                        <ul>
+                            <li>Any outbound to internet</li>
+                            <li>Any inbound from internet</li>
+                            <li>Any connection to external networks</li>
+                            <li>Any VPN connections</li>
+                            <li>Any cloud services</li>
+                        </ul>
+                        
+                        <h4>Physical Security</h4>
+                        <ul>
+                            <li>Controlled access to Pico Server</li>
+                            <li>Video surveillance of server location</li>
+                            <li>Access logs maintained</li>
+                            <li>Tamper-evident Hub enclosures</li>
+                            <li>USB port locks (optional)</li>
+                            <li>Portable media controls</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h3>Local Authentication & Access Control</h3>
+                    <span class="toggle">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="content">
+                        <h4>Zero Cloud Authentication</h4>
+                        <p>All authentication must be performed locally without external dependencies.</p>
+                        
+                        <h4>LDAP/Active Directory Integration (Preferred)</h4>
+                        <ul>
+                            <li>Pico integrates with on-premise Active Directory</li>
+                            <li>LDAP bind authentication (port 389 or 636 LDAPS)</li>
+                            <li>Group-based access control mapping</li>
+                            <li>No external dependencies</li>
+                        </ul>
+                        
+                        <h4>Pico-Managed Local Authentication (Alternative)</h4>
+                        <ul>
+                            <li>Local user database on Pico Server</li>
+                            <li>SHA-256 hashed passwords with salt</li>
+                            <li>Configurable password policies</li>
+                            <li>No external dependencies</li>
+                            <li>Admin-managed user accounts</li>
+                        </ul>
+                        
+                        <h4>Operator Authentication</h4>
+                        <p><strong>PIN-Based Login:</strong></p>
+                        <ul>
+                            <li>6-digit PIN codes</li>
+                            <li>Stored locally in hashed format</li>
+                            <li>Assigned by administrator</li>
+                        </ul>
+                        
+                        <p><strong>Badge-Based Login:</strong></p>
+                        <ul>
+                            <li>USB badge reader connected to Pico Hub</li>
+                            <li>Badge number associated with operator</li>
+                            <li>No external badge system required</li>
+                            <li>Immediate authentication response</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Compliance Box -->
+        <div class="compliance-box">
+            <h3>Compliance & Security Certifications</h3>
+            <p><strong>SOC 2 Type 2:</strong> Pico MES completed SOC 2 Type 2 compliance certification as of Q3 2022</p>
+            <p><strong>ITAR Registration:</strong> Pico is ITAR-registered and provides US Citizen-only support for sensitive deployments</p>
+            <p><strong>Security Audits:</strong> Third-party cybersecurity firms have evaluated Pico's VPN access controls and security procedures</p>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>For more information: <a href="https://picomes.com">picomes.com</a> | <a href="mailto:contact@picomes.com">contact@picomes.com</a></p>
+        <p>Pico MES | 303 Twin Dolphin Drive, Suite 600, Redwood City, CA 94065</p>
+    </div>
+    
+    <script>
+        function showDocument(docId) {
+            // Hide all documents
+            const docs = document.querySelectorAll('.document-section');
+            docs.forEach(doc => doc.classList.remove('active'));
+            
+            // Show selected document
+            document.getElementById(docId).classList.add('active');
+            
+            // Update nav tabs
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+        
+        function toggleSection(header) {
+            const content = header.nextElementSibling;
+            const isOpen = content.classList.contains('show');
+            
+            if (isOpen) {
+                content.classList.remove('show');
+                header.classList.remove('open');
+            } else {
+                content.classList.add('show');
+                header.classList.add('open');
+            }
+        }
+        
+        // Expand all sections for print
+        window.addEventListener('beforeprint', function() {
+            const contents = document.querySelectorAll('.section-content');
+            contents.forEach(content => {
+                content.style.maxHeight = 'none';
+                content.style.padding = '1.5rem';
+            });
+        });
+    </script>
+</body>
+</html>
